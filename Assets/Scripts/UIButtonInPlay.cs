@@ -3,6 +3,9 @@ using UnityEngine.SceneManagement;
 
 public class UIButtonInPlay : MonoBehaviour
 {
+    [SerializeField] private AudioSource m_CarAudioSourse;
+    [SerializeField] private GameObject m_UIButtonPause;
+    public GameObject UIButtonPause => m_UIButtonPause;
     [SerializeField] private GameObject m_UIPause;
     public GameObject UIPause => m_UIPause;
     [SerializeField] private GameObject m_UIEndOfRide;
@@ -12,8 +15,13 @@ public class UIButtonInPlay : MonoBehaviour
     private void Start()
     {
         Time.timeScale = 1.0f;
-        m_UIPause.SetActive(false);
-        m_UIEndOfRide.SetActive(false);
+        if (m_UIPause != null && m_UIEndOfRide != null && m_UIButtonPause != null)
+        {
+            m_UIPause.SetActive(false);
+            m_UIEndOfRide.SetActive(false);
+            m_UIButtonPause.SetActive(true);
+        }
+
     }
 
     public void PauseActivate()
@@ -22,7 +30,9 @@ public class UIButtonInPlay : MonoBehaviour
         {
             Time.timeScale = 0.0f;
             m_UIPause.SetActive(true);
+            m_UIButtonPause.SetActive(false);
             m_PauseActivate = true;
+            m_CarAudioSourse.enabled= false;
         }
 
     }
@@ -30,18 +40,26 @@ public class UIButtonInPlay : MonoBehaviour
     {
         m_PauseActivate = false;
         m_UIPause.SetActive(false);
+        m_UIButtonPause.SetActive(true);
+        m_CarAudioSourse.enabled = true;
         Time.timeScale = 1.0f;
     }
-    public void NewGame()
+    public void LoadScene(string _sceneName)
     {
         EnemyCarSort[] carsEnemy = FindObjectsOfType<EnemyCarSort>();
-        for (int i = 0; i < carsEnemy.Length; i++)
+        if (carsEnemy != null)
         {
-            carsEnemy[i].Delete(true);
+            for (int i = 0; i < carsEnemy.Length; i++)
+            {
+                carsEnemy[i].Delete(true);
+            }
         }
         TriggerSpawn.trig = 0;
-        SceneManager.LoadScene(0);
+        SceneManager.LoadScene(_sceneName);
     }
-
+    public void Quit()
+    {
+        Application.Quit();
+    }
 
 }
